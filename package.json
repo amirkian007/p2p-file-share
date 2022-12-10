@@ -1,0 +1,21 @@
+{
+  "name": "p2p-file-share",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "sha256": "^0.2.0",
+    "simple-peer": "^9.11.1",
+    "vue": "^3.2.41",
+    "ws": "^8.11.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^3.2.0",
+    "vite": "^3.2.3"
+  }
+}
