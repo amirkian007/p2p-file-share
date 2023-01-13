@@ -4,17 +4,19 @@
 
 <template>
 
-  <textarea id="incoming"></textarea>
-  <button @click="createPees">connect to network</button>
-  <input v-model="username" /><br />
-  search name : <input v-model="searchname"/><button @click="getByName">get</button><br />
-  search hash : <input v-model="searchHASH" /><button>get</button><br />
-  <input @change="fileHandle" type="file" />
+  <button @click="createPees" v-if="!Object.keys(connectedPeers).length>0">connect to network</button>
+  <input v-model="username" v-if="!Object.keys(connectedPeers).length>0"/><br />
+  <div v-if="Object.keys(connectedPeers).length>0" >
+    
+    search name : <input v-model="searchname"/><button @click="getByName">get</button><br />
+    search hash : <input v-model="searchHASH"  /><button>get</button><br />
+  </div>
+  <input v-if="Object.keys(connectedPeers).length>0"  @change="fileHandle" type="file" />
   <div v-for="(value, key) in connectedPeers" :key="key">
     {{ key }}
   </div>
   <pre id="outgoing"></pre>
-  <div class="card" v-for="(key,i) in filesP">
+  <div v-if="Object.keys(connectedPeers).length>0"  class="card" v-for="(key,i) in filesP">
     <div>
       file hash:  {{filesP[i][0].fileHash}}
     </div>
@@ -39,6 +41,18 @@
 import sha256 from 'sha256'
 export default {
   async mounted() {
+    const ciphertext =CryptoJS.AES.encrypt('my message', 'secret key 123').toString();
+    //console.log(x.ciphertext)
+    // const y = x.formatter.stringify(x)
+    // console.log(y)
+    console.log(ciphertext)
+    // console.log(CryptoJS.AES.decrypt('AesCtrParams','kir',y))
+    var bytes  = CryptoJS.AES.decrypt(ciphertext, 'secret key 123');
+var originalText = bytes.toString(CryptoJS.enc.Utf8);
+
+console.log(originalText); // 'my message'
+    //console.log(CryptoJS.AES.encrypt('AesCtrParams','kir','toop').formatter.stringify(CryptoJS.AES.encrypt('AesCtrParams','kir','toop')))
+    
     // ws.onclose = ()=> {
     //   console.log('disconnected');
     // };
@@ -97,8 +111,13 @@ let data = ""
 for(var i=0;i<yop.length;i++){
   data += yop[i].part
 }
+
+var bytes  = CryptoJS.AES.decrypt(data, 'secret key 123');
+var originalText = bytes.toString(CryptoJS.enc.Utf8);
+
+console.log(originalText); // 'my message'
       var a = document.createElement("a"); //Create <a>
-a.href = data; //Image Base64 Goes here
+a.href = originalText; //Image Base64 Goes here
 a.download = "Image.png"; //File name Here
 a.click(); //Downloaded file
 
@@ -115,8 +134,13 @@ a.click(); //Downloaded file
       const files = JSON.parse(localStorage.getItem('savess'))
       for(let hash in files){
         if(files[hash].name === this.searchname){
-          this.filesP[part.hash] ?  null :this.filesP[part.hash] = []
-          this.filesP[part.hash].push(files[hash])
+          // const x = {
+          //   type : 'searchResult',
+          //   part : files[hash]
+          // }
+          // this.connectedPeers[username].send(JSON.stringify(x))
+          this.filesP[files[hash].fileHash] ?  null :this.filesP[files[hash].fileHash] = []
+          this.filesP[files[hash].fileHash].push(files[hash])
         }
       }
     },
@@ -150,7 +174,8 @@ a.click(); //Downloaded file
       var reader = new FileReader();
       reader.readAsDataURL(file);
       let dep =(ress)=>{
-        this.sendChunks(this.chunkSubstr(ress,240000,file))
+        var ciphertext = CryptoJS.AES.encrypt(ress, 'secret key 123').toString();
+        this.sendChunks(this.chunkSubstr(ciphertext,240000,file))
       }
       reader.onload = function () {
           reader.result ;

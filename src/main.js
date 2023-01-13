@@ -2,7 +2,7 @@ import { createApp} from 'vue'
 import './style.css'
 import App from './App.vue'
 
-console.log(createApp)
+//console.log(createApp)
 // const ws = new WebSocket('wss://localhost:5173/.com/');
 
 // ws.on('open', function open() {

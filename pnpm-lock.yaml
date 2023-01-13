@@ -2,6 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   '@vitejs/plugin-vue': ^3.2.0
+  aes-encryption: ^1.0.4
   sha256: ^0.2.0
   simple-peer: ^9.11.1
   vite: ^3.2.3
@@ -9,6 +10,7 @@ specifiers:
   ws: ^8.11.0
 
 dependencies:
+  aes-encryption: 1.0.4
   sha256: 0.2.0
   simple-peer: 9.11.1
   vue: 3.2.45
@@ -144,6 +146,11 @@ packages:
 
   /@vue/shared/3.2.45:
     resolution: {integrity: sha512-Ewzq5Yhimg7pSztDV+RH1UDKBzmtqieXQlpTVm2AwraoRL/Rks96mvd8Vgi7Lj+h+TH8dv7mXD3FRZR3TUvbSg==}
+
+  /aes-encryption/1.0.4:
+    resolution: {integrity: sha512-Mb3UAbIvY0wiK6GjZGolVLXvIRHukUoSUQOOItjHNGuEWuClSsBPWEMdLYbCPuIKIFF5YkHTtWT+VqbLIQK/Og==}
+    engines: {node: '>= 0.10.0'}
+    dev: false
 
   /base64-js/1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}

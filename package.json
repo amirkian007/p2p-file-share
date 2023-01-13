@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "aes-encryption": "^1.0.4",
     "sha256": "^0.2.0",
     "simple-peer": "^9.11.1",
     "vue": "^3.2.41",
