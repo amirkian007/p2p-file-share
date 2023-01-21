@@ -14,10 +14,10 @@ wss.on('listening',()=>{
   console.log("server is live!!")
 })
 wss.on('connection', function connection(ws) {
-  console.log("connected!")
+ // console.log("connected!")
   let idddd = ""
   ws.on('message', function message(data) {
-    console.log('received: %s', data);
+ //   console.log('received: %s', data);
     const dataPRASED = parse(data)
     if(dataPRASED.type ==="register"){
       const username = dataPRASED.payload.username;

@@ -6,6 +6,7 @@
  
   <button @click="createPees" v-if="!Object.keys(connectedPeers).length>0">connect to network</button>
   <input v-model="username" v-if="!Object.keys(connectedPeers).length>0"/><br />
+  <div v-if="loading">connecting to network...</div>
 
   <div style="color: hotpink; border: 1px solid hotpink; border-radius: 10px;">
 
@@ -111,7 +112,8 @@ export default {
       searchHASH :'',
       filesP : {},
       DecryptionDownload:"",
-      encryptionUpload:""
+      encryptionUpload:"",
+      loading:false
     }
   },
   methods: {
@@ -223,8 +225,11 @@ this.DecryptionDownload = ""
     },
     createPees(ev) {
       ev.preventDefault()
-      const ws = new WebSocket('ws://localhost:8585');
+      const ws = new WebSocket('wss://signal121.onrender.com');
+      this.loading = true
       ws.onopen = () => {
+      this.loading = false
+
         console.log('connected',ws);
         let data = {
           type: "register", payload: {
@@ -339,6 +344,10 @@ this.DecryptionDownload = ""
         if (rawData.type === "awnserRecived") {
           this.offersentList[rawData.fromUserName].signal(rawData.awnser)
         }
+      }
+      ws.onerror = ()=>{
+      this.loading = false
+
       }
       // const p = new SimpluseePeer({
       //   initiator: true,
