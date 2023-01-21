@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "server":"node ./server.js"
   },
   "dependencies": {
     "aes-encryption": "^1.0.4",
