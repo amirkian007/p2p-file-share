@@ -3,18 +3,31 @@
 </script>
 
 <template>
-
+ 
   <button @click="createPees" v-if="!Object.keys(connectedPeers).length>0">connect to network</button>
   <input v-model="username" v-if="!Object.keys(connectedPeers).length>0"/><br />
-  <div v-if="Object.keys(connectedPeers).length>0" >
-    
+
+  <div style="color: hotpink; border: 1px solid hotpink; border-radius: 10px;">
+
+Connected Nodes : 
+<div v-for="(value, key) in connectedPeers" :key="key">
+  {{ key }}
+</div>
+</div>
+  <div style="border: 1px solid green;margin-top: 5px;border-radius: 10px;" v-if="Object.keys(connectedPeers).length>0" >
+    <div>GET FILE</div>
     search name : <input v-model="searchname"/><button @click="getByName">get</button><br />
     search hash : <input v-model="searchHASH"  /><button>get</button><br />
   </div>
-  <input v-if="Object.keys(connectedPeers).length>0"  @change="fileHandle" type="file" />
-  <div v-for="(value, key) in connectedPeers" :key="key">
-    {{ key }}
+  <div style="border: 1px solid blue;margin-top: 5px;border-radius: 10px;">
+    <div>UPLOAD FILE</div>
+
+    <input v-if="Object.keys(connectedPeers).length>0"  @change="fileHandle" type="file" />
+    <div v-if="Object.keys(connectedPeers).length>0">
+      Encryption key :  <input v-model="encryptionUpload" /><br />
+    </div>
   </div>
+  
   <pre id="outgoing"></pre>
   <div v-if="Object.keys(connectedPeers).length>0"  class="card" v-for="(key,i) in filesP">
     <div>
@@ -32,26 +45,23 @@
     <div>
       Avalible Parts:  {{filesP[i].length}} of {{filesP[i][0].partCount}}
     </div>
+    Decryption key :  <input v-model="DecryptionDownload" />
     <button @click="download(filesP[i])">download</button>
    <!-- fileHash:  {{filesP[i]}} -->
   </div>
+  <div>
+
+<textarea id="textarea" rows="15" cols="50">
+  
+</textarea>
+</div>
 </template>
 
 <script>
 import sha256 from 'sha256'
 export default {
   async mounted() {
-    const ciphertext =CryptoJS.AES.encrypt('my message', 'secret key 123').toString();
-    //console.log(x.ciphertext)
-    // const y = x.formatter.stringify(x)
-    // console.log(y)
-    console.log(ciphertext)
-    // console.log(CryptoJS.AES.decrypt('AesCtrParams','kir',y))
-    var bytes  = CryptoJS.AES.decrypt(ciphertext, 'secret key 123');
-var originalText = bytes.toString(CryptoJS.enc.Utf8);
-
-console.log(originalText); // 'my message'
-    //console.log(CryptoJS.AES.encrypt('AesCtrParams','kir','toop').formatter.stringify(CryptoJS.AES.encrypt('AesCtrParams','kir','toop')))
+  
     
     // ws.onclose = ()=> {
     //   console.log('disconnected');
@@ -99,7 +109,9 @@ console.log(originalText); // 'my message'
       connectedPeers: {},
       searchname :'',
       searchHASH :'',
-      filesP : {}
+      filesP : {},
+      DecryptionDownload:"",
+      encryptionUpload:""
     }
   },
   methods: {
@@ -112,15 +124,14 @@ for(var i=0;i<yop.length;i++){
   data += yop[i].part
 }
 
-var bytes  = CryptoJS.AES.decrypt(data, 'secret key 123');
+var bytes  = CryptoJS.AES.decrypt(data, this.DecryptionDownload);
 var originalText = bytes.toString(CryptoJS.enc.Utf8);
 
-console.log(originalText); // 'my message'
       var a = document.createElement("a"); //Create <a>
 a.href = originalText; //Image Base64 Goes here
 a.download = "Image.png"; //File name Here
 a.click(); //Downloaded file
-
+this.DecryptionDownload = ""
     },
     getByName(){
       const data = {
@@ -174,7 +185,7 @@ a.click(); //Downloaded file
       var reader = new FileReader();
       reader.readAsDataURL(file);
       let dep =(ress)=>{
-        var ciphertext = CryptoJS.AES.encrypt(ress, 'secret key 123').toString();
+        var ciphertext = CryptoJS.AES.encrypt(ress, this.encryptionUpload).toString();
         this.sendChunks(this.chunkSubstr(ciphertext,240000,file))
       }
       reader.onload = function () {
@@ -214,7 +225,7 @@ a.click(); //Downloaded file
       ev.preventDefault()
       const ws = new WebSocket('ws://localhost:8585');
       ws.onopen = () => {
-        console.log('connected');
+        console.log('connected',ws);
         let data = {
           type: "register", payload: {
             username: this.username
@@ -255,6 +266,7 @@ a.click(); //Downloaded file
             p.on('connect', () => {
               this.ontabClose(p.destroy)
               window.addEventListener("beforeunload", () => {
+                ws.close()
                 p.destroy()
               });
               console.log('CONNECT to ', sendSignalto)
@@ -269,7 +281,9 @@ a.click(); //Downloaded file
                 fromUserName: this.username,
                 signal: data
               }
-              console.log("signal sent to", data)
+              console.log("signal sent to")
+             document.getElementById('textarea').value = document.getElementById('textarea').value +  JSON.stringify(data)
+
               ws.send(JSON.stringify(ydata))
               this.offersentList[sendSignalto] = p
             })
@@ -280,7 +294,7 @@ a.click(); //Downloaded file
           p.signal(rawData.signal)
           p.on('close', () => {
             console.log("disconnected : ", rawData.fromUserName)
-            delete this.connectedPeers[fromUserName]
+            delete this.connectedPeers[rawData.fromUserName]
           })
           const self  = this
           p.on('data', function (chunk) {
@@ -301,6 +315,7 @@ a.click(); //Downloaded file
           p.on('connect', () => {
             this.ontabClose(p.destroy)
             window.addEventListener("beforeunload", () => {
+              ws.close()
               p.destroy()
             });
             this.connectedPeers[rawData.fromUserName] = this.awnserSent[rawData.fromUserName]
@@ -314,6 +329,7 @@ a.click(); //Downloaded file
               fromUserName: this.username,
               awnser: data
             }
+            document.getElementById('textarea').value = document.getElementById('textarea').value +  JSON.stringify(data)
             ws.send(JSON.stringify(ydata))
             this.awnserSent[rawData.fromUserName] = p
             // send this signaling data to peer1 somehow
