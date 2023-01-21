@@ -10,7 +10,9 @@ function parse(d){
 function stringify(d){
   return JSON.stringify(d)
 }
-
+wss.on('listening',()=>{
+  console.log("server is live!!")
+})
 wss.on('connection', function connection(ws) {
   console.log("connected!")
   let idddd = ""
